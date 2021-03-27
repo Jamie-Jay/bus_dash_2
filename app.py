@@ -137,7 +137,7 @@ app.layout = html.Div(
                         dcc.Markdown(
                             children=[
                                 "Source: [Cornell Tech Urban Tech Hub]("
-                                "https://github.com/fivethirtyeight/uber-tlc-foil-response/tree/master/uber-trip-data)"
+                                "https://github.com/Cornell-Tech-Urban-Tech-Hub)"
                             ]
                         ),
                     ],
@@ -254,7 +254,7 @@ def update_total_positions(datePicked):
 def update_total_positions_selection(datePicked, selection):
     firstOutput = ""
 
-    if selection is not None or len(selection) is not 0:
+    if selection != None or len(selection) != 0:
         date_picked = dt.strptime(datePicked, "%Y-%m-%d")
         totalInSelection = 0
         for x in selection:
@@ -267,10 +267,10 @@ def update_total_positions_selection(datePicked, selection):
         firstOutput = "Total positions in selection: {:,d}".format(totalInSelection)
 
     if (
-        datePicked is None
-        or selection is None
-        or len(selection) is 24
-        or len(selection) is 0
+        datePicked == None
+        or selection == None
+        or len(selection) == 24
+        or len(selection) == 0
     ):
         return firstOutput, (datePicked, " - showing hour(s): All")
 
@@ -365,11 +365,11 @@ def getLatLonColor(selectedData, month, day):
     listCoords = totalList[month][day]
 
     # No times selected, output all times for chosen month and date
-    if selectedData is None or len(selectedData) is 0:
+    if selectedData == None or len(selectedData) == 0:
         return listCoords
     listStr = "listCoords["
     for time in selectedData:
-        if selectedData.index(time) is not len(selectedData) - 1:
+        if selectedData.index(time) != len(selectedData) - 1:
             listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ") | "
         else:
             listStr += "(totalList[month][day].index.hour==" + str(int(time)) + ")]"

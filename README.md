@@ -1,4 +1,4 @@
-# Dash Uber Rides Demo
+# NYC Buswatcher Data Viewer
 
 ## About this app
 
@@ -11,21 +11,13 @@ This is a demo of the Dash interactive Python framework developed by [Plotly](ht
 To run this app first clone repository and then open a terminal to the app folder.
 
 ```
-git clone https://github.com/plotly/dash-sample-apps.git
-cd dash-sample-apps/apps/dash-uber-rides-demo
+git clone https://github.com/anthonymobile/bus_dash_2
+cd bus_dash_2
 ```
 
 Create and activate a new virtual environment (recommended) by running
 the following:
 
-On Windows
-
-```
-virtualenv venv 
-\venv\scripts\activate
-```
-
-Or if using linux
 
 ```bash
 python3 -m venv myvenv
@@ -45,10 +37,8 @@ python app.py
 You can run the app on your browser at http://127.0.0.1:8050
 
 
-## Screenshots
 
-![demo.png](demo.png)
 
-## Resources
+## Source
 
-To learn more about Dash, please visit [documentation](https://plot.ly/dash).
+Adapted from Dash sample app ["Uber Rides"](https://github.com/plotly/dash-sample-apps/tree/master/apps/dash-uber-rides-demo).
