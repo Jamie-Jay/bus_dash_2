@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import numpy as np
+import os
 
 from dash.dependencies import Input, Output
 from plotly import graph_objs as go
@@ -17,7 +18,8 @@ server = app.server
 
 
 # Plotly mapbox public token
-mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
+# "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
+mapbox_access_token = os.getenv('MAPBOX_API_KEY')
 
 # Dictionary of important locations in New York
 list_of_locations = {
@@ -35,19 +37,6 @@ list_of_locations = {
 # Initialize data frame
 datafile='feb2021e149th.csv'
 df=pd.read_csv(datafile, sep='\t')
-# df1 = pd.read_csv(
-#     "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data1.csv",
-#     dtype=object,
-# )
-# df2 = pd.read_csv(
-#     "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data2.csv",
-#     dtype=object,
-# )
-# df3 = pd.read_csv(
-#     "https://raw.githubusercontent.com/plotly/datasets/master/uber-rides-data3.csv",
-#     dtype=object,
-# )
-# df = pd.concat([df1, df2, df3], axis=0)
 
 
 df["Date/Time"] = pd.to_datetime(df["timestamp"], format="%Y-%m-%d %H:%M") #todo verify/update format
@@ -59,7 +48,7 @@ for month in df.groupby(df.index.month):
     for day in month[1].groupby(month[1].index.day):
         dailyList.append(day[1])
     totalList.append(dailyList)
-totalList = np.array(totalList)
+totalList = np.array(totalList,dtype=object)
 
 # Layout of Dash App
 app.layout = html.Div(
@@ -72,22 +61,23 @@ app.layout = html.Div(
                     className="four columns div-user-controls",
                     children=[
                         html.Img(
-                            className="logo", src=app.get_asset_url("dash-logo-new.png")
+                            className="logo", src=app.get_asset_url("cornell-logo.png")
                         ),
                         html.H2("NYCBUSWATCHER VIEWER"),
                         html.P(
                             """Select different days using the date picker or by selecting
                             different time frames on the histogram."""
                         ),
+
                         html.Div(
                             className="div-for-dropdown",
                             children=[
                                 dcc.DatePickerSingle(
                                     id="date-picker",
-                                    min_date_allowed=dt(2014, 4, 1),
-                                    max_date_allowed=dt(2014, 9, 30),
-                                    initial_visible_month=dt(2014, 4, 1),
-                                    date=dt(2014, 4, 1).date(),
+                                    min_date_allowed=dt(2021, 2, 1),
+                                    max_date_allowed=dt(2021, 2, 28),
+                                    initial_visible_month=dt(2021, 2, 1),
+                                    date=dt(2021, 2, 14).date(),
                                     display_format="MMMM D, YYYY",
                                     style={"border": "0px solid black"},
                                 )
@@ -241,7 +231,7 @@ def update_selected_data(clickData):
 @app.callback(Output("total-positions", "children"), [Input("date-picker", "date")])
 def update_total_positions(datePicked):
     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
-    return "Total Number of rides: {:,d}".format(
+    return "Total Number of bus positions: {:,d}".format(
         len(totalList[date_picked.month - 4][date_picked.day - 1])
     )
 
@@ -386,9 +376,9 @@ def getLatLonColor(selectedData, month, day):
     ],
 )
 def update_graph(datePicked, selectedData, selectedLocation):
-    zoom = 12.0
-    latInitial = 40.7272
-    lonInitial = -73.991251
+    zoom = 11.0
+    latInitial = 40.81
+    lonInitial = -73.91
     bearing = 0
 
     if selectedLocation:
