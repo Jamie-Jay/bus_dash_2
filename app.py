@@ -65,7 +65,11 @@ app.layout = html.Div(
                         ),
                         html.H2("NYCBUSWATCHER VIEWER"),
                         html.P(
-                            """Select different days using the date picker or by selecting
+                            """This visualization shows observed bus positions on 4 routes  
+                            serving the East 149th Street corridor in the Bronx.
+                            Select different days using the 
+                            date picker or by 
+                            selecting
                             different time frames on the histogram."""
                         ),
 
@@ -87,20 +91,22 @@ app.layout = html.Div(
                         html.Div(
                             className="row",
                             children=[
-                                html.Div(
-                                    className="div-for-dropdown",
-                                    children=[
-                                        # Dropdown for locations on map
-                                        dcc.Dropdown(
-                                            id="location-dropdown",
-                                            options=[
-                                                {"label": i, "value": i}
-                                                for i in list_of_locations
-                                            ],
-                                            placeholder="Select a location",
-                                        )
-                                    ],
-                                ),
+
+                                # # todo convert this to route selector
+                                # html.Div(
+                                #     className="div-for-dropdown",
+                                #     children=[
+                                #         # Dropdown for locations on map
+                                #         dcc.Dropdown(
+                                #             id="location-dropdown",
+                                #             options=[
+                                #                 {"label": i, "value": i}
+                                #                 for i in list_of_locations
+                                #             ],
+                                #             placeholder="Select a location",
+                                #         )
+                                #     ],
+                                # ),
                                 html.Div(
                                     className="div-for-dropdown",
                                     children=[
@@ -372,19 +378,20 @@ def getLatLonColor(selectedData, month, day):
     [
         Input("date-picker", "date"),
         Input("bar-selector", "value"),
-        Input("location-dropdown", "value"),
+        # Input("location-dropdown", "value"),
     ],
 )
-def update_graph(datePicked, selectedData, selectedLocation):
-    zoom = 11.0
+#def update_graph(datePicked, selectedData, selectedLocation):
+def update_graph(datePicked, selectedData):
+    zoom = 12.0
     latInitial = 40.81
-    lonInitial = -73.91
+    lonInitial = -73.81
     bearing = 0
 
-    if selectedLocation:
-        zoom = 15.0
-        latInitial = list_of_locations[selectedLocation]["lat"]
-        lonInitial = list_of_locations[selectedLocation]["lon"]
+    # if selectedLocation:
+    #     zoom = 15.0
+    #     latInitial = list_of_locations[selectedLocation]["lat"]
+    #     lonInitial = list_of_locations[selectedLocation]["lon"]
 
     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
     monthPicked = date_picked.month - 4
@@ -434,15 +441,15 @@ def update_graph(datePicked, selectedData, selectedLocation):
                     ),
                 ),
             ),
-            # Plot of important locations on the map
-            Scattermapbox(
-                lat=[list_of_locations[i]["lat"] for i in list_of_locations],
-                lon=[list_of_locations[i]["lon"] for i in list_of_locations],
-                mode="markers",
-                hoverinfo="text",
-                text=[i for i in list_of_locations],
-                marker=dict(size=8, color="#ffa0a0"),
-            ),
+            # # Plot of important locations on the map
+            # Scattermapbox(
+            #     lat=[list_of_locations[i]["lat"] for i in list_of_locations],
+            #     lon=[list_of_locations[i]["lon"] for i in list_of_locations],
+            #     mode="markers",
+            #     hoverinfo="text",
+            #     text=[i for i in list_of_locations],
+            #     marker=dict(size=8, color="#ffa0a0"),
+            # ),
         ],
         layout=Layout(
             autosize=True,
