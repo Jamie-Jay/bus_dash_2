@@ -44,7 +44,7 @@ df=pd.read_csv(datafile, sep='\t', skiprows=1)
 totalList = {}
 for df_route in df.groupby('route_short'):
 
-    df_route[1]["Date/Time"] = pd.to_datetime(df_route[1]["timestamp"], format="%Y-%m-%d %H:%M:%S") #todo verify/update format
+    df_route[1]["Date/Time"] = pd.to_datetime(df_route[1]["timestamp"], format="%Y-%m-%d %H:%M:%S") # verify/update format
     df_route[1].index = df_route[1]["Date/Time"]
     df_route[1].drop("Date/Time", 1, inplace=True)
 
@@ -178,6 +178,15 @@ daysInMonth = [28]
 # Get index for the specified month in the dataframe
 monthIndex = pd.Index(["Feb"])
 
+# Select all routes when no routes are selected
+def update_routes(routeSelected):
+    if (routeSelected == None or len(routeSelected) == 0):
+        routeSelected = list(totalList.keys())
+    if isinstance(routeSelected, str):
+        routeSelected = [routeSelected]
+
+    return routeSelected
+
 # Get the amount of rides per hour based on the time selected
 # This also higlights the color of the histogram bars based on
 # if the hours are selected
@@ -230,7 +239,7 @@ def get_selection(route, month, day, selection):
     Output("hour-selector", "value"),
     [Input("histogram", "selectedData"), Input("histogram", "clickData")],
 )
-def update_bar_selector(value, clickData):
+def update_hour_selector(value, clickData):
     holder = []
     if clickData:
         holder.append(str(int(clickData["points"][0]["x"])))
@@ -272,8 +281,7 @@ def update_total_positions_selection(routeSelected, datePicked, selection):
         date_picked = dt.strptime(datePicked, "%Y-%m-%d")
         totalInSelection = 0
         
-        if isinstance(routeSelected, str):
-            routeSelected = [routeSelected]
+        routeSelected = update_routes(routeSelected)
         for r in routeSelected:
             for x in selection:
                 totalInSelection += len(
@@ -289,6 +297,8 @@ def update_total_positions_selection(routeSelected, datePicked, selection):
         or selection == None
         or len(selection) == 24
         or len(selection) == 0
+        or routeSelected == None
+        or len(routeSelected) == 0
     ):
         return firstOutput, (datePicked, " - showing hour(s): All")
 
@@ -323,8 +333,7 @@ def update_histogram(routeSelected, datePicked, selection):
     res = []
     xVals = []
     yVals = []
-    if isinstance(routeSelected, str):
-        routeSelected = [routeSelected]
+    routeSelected = update_routes(routeSelected)
     for r in routeSelected:
         [xVal, yVal, colorVal] = get_selection(r, monthPicked, dayPicked, selection)
         xVals.extend(xVal)
@@ -442,8 +451,7 @@ def update_graph(routeSelected, datePicked, selectedData):
     res = []
     xVals = []
     yVals = []
-    if isinstance(routeSelected, str):
-        routeSelected = [routeSelected]
+    routeSelected = update_routes(routeSelected)
     for r in routeSelected:
         listCoords = getLatLonColor(r, selectedData, monthPicked, dayPicked)
 
