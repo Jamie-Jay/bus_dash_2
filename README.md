@@ -21,7 +21,10 @@ the following:
 
 ```bash
 python3 -m venv myvenv
-source myvenv/bin/activate
+# source myvenv/bin/activate
+cd myvenv
+activate
+cd ..
 ```
 
 Install the requirements:
@@ -29,6 +32,19 @@ Install the requirements:
 ```
 pip install -r requirements.txt
 ```
+
+Put `feb2021e149th.csv` file in the root folder
+
+Set environement variable:  
+Windows:
+```
+set MAPBOX_API_KEY=<your map box access token>
+```
+Linux:
+```
+export MAPBOX_API_KEY=<your map box access token>
+```
+
 Run the app:
 
 ```
