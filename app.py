@@ -1,6 +1,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import pandas as pd
 import numpy as np
 import os
@@ -10,9 +11,12 @@ from plotly import graph_objs as go
 from plotly.graph_objs import *
 from datetime import datetime as dt
 
+import constants
+from datafeed import totalList as totalList
 
 app = dash.Dash(
-    __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
+    __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
+    external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 server = app.server
 
@@ -21,162 +25,189 @@ server = app.server
 # "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
 mapbox_access_token = os.getenv('MAPBOX_API_KEY')
 
-
-# Dictionary of important locations in New York
-list_of_locations = {
-    "Madison Square Garden": {"lat": 40.7505, "lon": -73.9934},
-    "Yankee Stadium": {"lat": 40.8296, "lon": -73.9262},
-    "Empire State Building": {"lat": 40.7484, "lon": -73.9857},
-    "New York Stock Exchange": {"lat": 40.7069, "lon": -74.0113},
-    "JFK Airport": {"lat": 40.644987, "lon": -73.785607},
-    "Grand Central Station": {"lat": 40.7527, "lon": -73.9772},
-    "Times Square": {"lat": 40.7589, "lon": -73.9851},
-    "Columbia University": {"lat": 40.8075, "lon": -73.9626},
-    "United Nations HQ": {"lat": 40.7489, "lon": -73.9680},
-}
-
-# Initialize data frame
-datafile='feb2021e149th.csv'
-df=pd.read_csv(datafile, sep='\t', skiprows=1)
-
-
-# Get a dict containing lists of position counts per bus route, month, day
-totalList = {}
-for df_route in df.groupby('route_short'):
-
-    df_route[1]["Date/Time"] = pd.to_datetime(df_route[1]["timestamp"], format="%Y-%m-%d %H:%M:%S") # verify/update format
-    df_route[1].index = df_route[1]["Date/Time"]
-    df_route[1].drop("Date/Time", 1, inplace=True)
-
-    routeList = []
-    for month in df_route[1].groupby(df_route[1].index.month):
-        dailyList = []
-        for day in month[1].groupby(month[1].index.day):
-            dailyList.append(day[1])
-        routeList.append(dailyList)
-    routeList = np.array(routeList,dtype=object)
-    
-    totalList[df_route[0]] = routeList
-
 # Layout of Dash App
 app.layout = html.Div(
-    children=[
-        html.Div(
-            className="row",
-            children=[
+    [
+        dbc.Row(
+            [
+                # Column for app info
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    html.Div(
+                                        # className="columns div-user-controls",
+                                        children=[
+                                            html.Img(
+                                                className="logo", src=app.get_asset_url("cornell-logo.png")
+                                            ),
+                                            html.H2("NYCBUSWATCHER VIEWER"),
+                                        ]
+                                    ),
+                                    className='row col-lg-6 col-md-6 col-xs-12 col-sm-12',
+                                    style={'padding': '30px 30px 10px 50px'}
+                                ),
+                                dbc.Col(
+                                    html.Div(
+                                        children=[
+                                            html.P(
+                                                    """This visualization shows observed bus positions on 4 routes
+                                                    serving the East 149th Street corridor in the Bronx.
+                                                    Select different days using the date picker or by
+                                                    selecting different time frames on the histogram."""
+                                            ),
+                                            dcc.Markdown(
+                                                children=[
+                                                    "Source: [Cornell Tech Urban Tech Hub]("
+                                                    "https://github.com/Cornell-Tech-Urban-Tech-Hub)"
+                                                ]
+                                            )
+                                        ]
+                                    ),
+                                    className='row col-lg-6 col-md-6 col-xs-12 col-sm-12',
+                                    style={'padding': '30px 30px 10px 50px'}
+                                ),
+                            ],
+                        ),
+                    ],
+                    className='col-lg-6 col-md-12 col-xs-12 col-sm-12'
+                ),
+
                 # Column for user controls
-                html.Div(
-                    className="four columns div-user-controls",
-                    children=[
-                        html.Img(
-                            className="logo", src=app.get_asset_url("cornell-logo.png")
-                        ),
-                        html.H2("NYCBUSWATCHER VIEWER"),
-                        html.P(
-                            """This visualization shows observed bus positions on 4 routes  
-                            serving the East 149th Street corridor in the Bronx.
-                            Select different days using the 
-                            date picker or by 
-                            selecting
-                            different time frames on the histogram."""
-                        ),
-
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                dcc.DatePickerSingle(
-                                    id="date-picker",
-                                    min_date_allowed=dt(2021, 2, 1),
-                                    max_date_allowed=dt(2021, 2, 28),
-                                    initial_visible_month=dt(2021, 2, 1),
-                                    date=dt(2021, 2, 14).date(),
-                                    display_format="MMMM D, YYYY",
-                                    style={"border": "0px solid black"},
-                                )
-                            ],
-                        ),
-
-                        # Change to side-by-side for mobile layout
-                        html.Div(
-                            className="row",
-                            children=[
-
-                        # convert this to route selector
-                                html.Div(
-                                    className="div-for-dropdown",
-                                    children=[
-                                        # Dropdown for route on map
-                                        dcc.Dropdown(
-                                            id="route-selector",
-                                            options=[
-                                                {
-                                                    "label": route, 
-                                                    "value": route
-                                                }
-                                                for route in totalList.keys()
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        html.Div(
+                                            className="div-for-dropdown",
+                                            children=[
+                                                dcc.DatePickerSingle(
+                                                    id="date-picker",
+                                                    min_date_allowed=dt(2021, 2, 1),
+                                                    max_date_allowed=dt(2021, 2, 28),
+                                                    initial_visible_month=dt(2021, 2, 1),
+                                                    date=dt(2021, 2, 14).date(),
+                                                    display_format="MMMM D, YYYY",
+                                                    style={"border": "0px solid black"},
+                                                )
                                             ],
-                                            placeholder="Select a route",
-                                            value=list(totalList.keys())[0],
-                                            multi=True
-                                        )
-                                    ],
-                                ),
-                                html.Div(
-                                    className="div-for-dropdown",
-                                    children=[
-                                        # Dropdown to select times
-                                        dcc.Dropdown(
-                                            id="hour-selector",
-                                            options=[
-                                                {
-                                                    "label": str(n) + ":00",
-                                                    "value": str(n),
-                                                }
-                                                for n in range(24)
+                                        ),
+                                        html.Div(
+                                            className="div-for-dropdown",
+                                            children=[
+                                                # Dropdown for route on map
+                                                dcc.Dropdown(
+                                                    id="route-selector",
+                                                    options=[
+                                                        {
+                                                            "label": route,
+                                                            "value": route
+                                                        }
+                                                        for route in totalList.keys()
+                                                    ],
+                                                    placeholder="Select a route",
+                                                    value=list(totalList.keys())[0],
+                                                    multi=True
+                                                )
                                             ],
-                                            multi=True,
-                                            placeholder="Select certain hours",
-                                        )
+                                        ),
+                                        html.Div(
+                                            className="div-for-dropdown",
+                                            children=[
+                                                # Dropdown to select times
+                                                dcc.Dropdown(
+                                                    id="hour-selector",
+                                                    options=[
+                                                        {
+                                                            "label": str(n) + ":00",
+                                                            "value": str(n),
+                                                        }
+                                                        for n in range(24)
+                                                    ],
+                                                    multi=True,
+                                                    placeholder="Select certain hours",
+                                                )
+                                            ],
+                                        ),
                                     ],
+                                    className='col-lg-6 col-md-6 col-xs-12 col-sm-12',
+                                    style={'padding': '30px 30px 10px 50px'}
                                 ),
-                            ],
-                        ),
-                        html.P(id="total-positions"),
-                        html.P(id="total-positions-selection"),
-                        html.P(id="date-value"),
-                        dcc.Markdown(
-                            children=[
-                                "Source: [Cornell Tech Urban Tech Hub]("
-                                "https://github.com/Cornell-Tech-Urban-Tech-Hub)"
+                                dbc.Col(
+                                    [
+                                        html.P(
+                                                """Statistics:"""
+                                            ),
+                                        html.P(id="total-positions"),
+                                        html.P(id="total-positions-selection"),
+                                        html.P(id="date-value"),
+                                    ],
+                                    className='col-lg-6 col-md-6 col-xs-12 col-sm-12',
+                                    style={'padding': '30px 30px 10px 50px'}
+                                ),
                             ]
-                        ),
+                        )
                     ],
-                ),
-                # Column for app graphs and plots
-                html.Div(
-                    className="eight columns div-for-charts bg-grey",
-                    children=[
-                        dcc.Graph(id="map-graph"),
-                        html.Div(
-                            className="text-padding",
-                            children=[
-                                "Select any of the bars on the histogram to section data by time."
-                            ],
-                        ),
-                        dcc.Graph(id="histogram"),
-                    ],
-                ),
+                    className='col-lg-6 col-md-12 col-xs-12 col-sm-12'
+                )
             ],
+            # style={'height': '50%'}
+        ),
+
+        # graphs
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            dbc.Col(
+                                html.Div(
+                                    className="text-padding",
+                                    children=[
+                                        "Scatter plot of bus positions for section data by time."
+                                    ],
+                                )
+                            )
+                        ),
+                        # Column for app graphs and plots
+                        dbc.Row(
+                            dbc.Col(
+                                dcc.Graph(id="map-graph"),
+                                style={"margin": '0px', 'padding':'0px'}
+                            )
+                        ),
+                    ],
+                    className='col-lg-6 col-md-12 col-xs-12 col-sm-12'
+                ),
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            dbc.Col(
+                                html.Div(
+                                    className="text-padding",
+                                    children=[
+                                        "Select any of the bars on the histogram to section data by time."
+                                    ],
+                                )
+                            )
+                        ),
+                        dbc.Row(
+                            dbc.Col(
+                                dcc.Graph(id="histogram"), 
+                                style={"margin": '0px', 'padding':'0px'}
+                            )
+                        ),
+                    ],
+                    className='col-lg-6 col-md-12 col-xs-12 col-sm-12'
+                )
+            ],
+            className="row-same-height"
         )
     ]
 )
-
-# Gets the amount of days in the specified month
-# Index represents month (0 is April, 1 is May, ... etc.)
-daysInMonth = [28]
-
-# Get index for the specified month in the dataframe
-monthIndex = pd.Index(["Feb"])
 
 # Select all routes when no routes are selected
 def update_routes(routeSelected):
@@ -194,32 +225,7 @@ def get_selection(route, month, day, selection):
     xVal = []
     yVal = []
     xSelected = []
-    colorVal = [
-        "#F4EC15",
-        "#DAF017",
-        "#BBEC19",
-        "#9DE81B",
-        "#80E41D",
-        "#66E01F",
-        "#4CDC20",
-        "#34D822",
-        "#24D249",
-        "#25D042",
-        "#26CC58",
-        "#28C86D",
-        "#29C481",
-        "#2AC093",
-        "#2BBCA4",
-        "#2BB5B8",
-        "#2C99B4",
-        "#2D7EB0",
-        "#2D65AC",
-        "#2E4EA4",
-        "#2E38A4",
-        "#3B2FA0",
-        "#4E2F9C",
-        "#603099",
-    ]
+    colorVal = constants.colorVal[:]
 
     # Put selected times into a list of numbers xSelected
     xSelected.extend([int(x) for x in selection])
@@ -230,7 +236,8 @@ def get_selection(route, month, day, selection):
             colorVal[i] = "#FFFFFF"
         xVal.append(i)
         # Get the number of rides at a particular time
-        yVal.append(len(totalList[route][month][day][totalList[route][month][day].index.hour == i]))
+        yVal.append(len(totalList[route][month][day]
+                    [totalList[route][month][day].index.hour == i]))
     return [np.array(xVal), np.array(yVal), np.array(colorVal)]
 
 
@@ -280,7 +287,7 @@ def update_total_positions_selection(routeSelected, datePicked, selection):
     if selection != None or len(selection) != 0:
         date_picked = dt.strptime(datePicked, "%Y-%m-%d")
         totalInSelection = 0
-        
+
         routeSelected = update_routes(routeSelected)
         for r in routeSelected:
             for x in selection:
@@ -356,7 +363,11 @@ def update_histogram(routeSelected, datePicked, selection):
                 name=r,
                 # hoverinfo="none",
                 mode="markers+lines",
-                marker=dict(color="rgb(66, 134, 244, 0)", symbol="square", size=40),
+                marker=dict(
+                    color="rgb(66, 134, 244, 0)",
+                    symbol="square", 
+                    size=40
+                ),
                 visible=True,
             )
         )
@@ -466,26 +477,13 @@ def update_graph(routeSelected, datePicked, selectedData):
                 text=listCoords.index.hour,
                 marker=dict(
                     showscale=True,
-                    color=np.append(np.insert(listCoords.index.hour, 0, 0), 23),
+                    color=np.append(
+                        np.insert(listCoords.index.hour, 0, 0),
+                        23),
                     opacity=0.5,
                     size=5,
                     colorscale=[
-                        [0, "#F4EC15"],
-                        [0.04167, "#DAF017"],
-                        [0.0833, "#BBEC19"],
-                        [0.125, "#9DE81B"],
-                        [0.1667, "#80E41D"],
-                        [0.2083, "#66E01F"],
-                        [0.25, "#4CDC20"],
-                        [0.292, "#34D822"],
-                        [0.333, "#24D249"],
-                        [0.375, "#25D042"],
-                        [0.4167, "#26CC58"],
-                        [0.4583, "#28C86D"],
-                        [0.50, "#29C481"],
-                        [0.54167, "#2AC093"],
-                        [0.5833, "#2BBCA4"],
-                        [1.0, "#613099"],
+                        [i / (len(constants.colorVal) - 1), v] for i, v in enumerate(constants.colorVal)
                     ],
                     colorbar=dict(
                         title="Time of<br>Day",
