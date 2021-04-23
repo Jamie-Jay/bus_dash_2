@@ -7,7 +7,13 @@ from plotly.graph_objs import *
 from datetime import datetime as dt
 import numpy as np
 
+# from urllib.request import urlopen
+import pandas as pd
+import geojson
+import json
+
 # from func import update_routes
+import datafeed as df
 from datafeed import totalList as totalList
 import constants
 
@@ -44,7 +50,59 @@ def getLatLonColor(route, selectedData, month, day):
 #         Input("hour-selector", "value"),
 #     ],
 # )
-#def update_graph(datePicked, selectedData, selectedLocation):
+def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_token):    
+    latInitial = 40.8167
+    lonInitial = -73.9199
+
+    lats=[]
+    lons=[]
+    for feature in df.geo_json["features"]:
+        lats=np.append(lats, np.array(feature["geometry"]["coordinates"])[:, 1])
+        lons=np.append(lons, np.array(feature["geometry"]["coordinates"])[:, 0])
+        print ("*"*50)
+    print(pd.DataFrame(lats))
+    print(df.stop_lats)
+    print(type(lons))
+    print(type(df.stop_lons))
+
+    fig = go.Figure(
+            go.Scattermapbox(
+            lat=df.stop_lats,
+            lon=df.stop_lons,
+            # lat=pd.DataFrame(lats), # not working, why
+            # lon=pd.DataFrame(lons), # not working, why
+            mode='markers',
+            marker=go.scattermapbox.Marker(
+                size=9
+            ),
+            text=df.stop_names,
+        )
+        # data=[
+        #     go.Scattermapbox(
+        #         lat=np.array(feature["geometry"]["coordinates"])[:, 1],
+        #         lon=np.array(feature["geometry"]["coordinates"])[:, 0],
+        #         mode="lines",
+        #         line=dict(width=8, color="#F00")
+        #     )
+        #     for feature in df.geo_json["features"]
+        # ]
+    )
+  
+    fig.update_layout(
+        autosize=True,
+        margin=go.layout.Margin(l=0, r=35, t=0, b=0),
+        hovermode='closest',
+        mapbox=dict(
+            accesstoken=mapbox_access_token,
+            bearing=0,
+            center=dict(lat=latInitial, lon=lonInitial),
+            pitch=0,
+            zoom=12,
+        ),
+    )
+    return fig
+
+
 def update_graph(routeSelected, datePicked, selectedData, mapbox_access_token):
     zoom = 12.0
     latInitial = 40.8167

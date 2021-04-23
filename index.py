@@ -54,6 +54,19 @@ def update_graph(datePicked, selectedData, selectedLocation):
     return graphs.update_graph(datePicked, selectedData, selectedLocation, mapbox_access_token)
 
 
+@app.callback(
+    Output("map-graph-all", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("date-picker", "date"),
+        # Input("time-range-slider", "value"),
+        Input("hour-selector", "value"),    
+    ],
+)
+def update_graph2(datePicked, selectedData, selectedLocation):
+    return graphs.update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_token)
+
+
 # Update Histogram Figure based on Month, Day and Times Chosen
 @app.callback(
     Output("histogram", "figure"),
