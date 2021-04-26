@@ -9,12 +9,13 @@ import numpy as np
 
 # from urllib.request import urlopen
 import pandas as pd
-import geojson
 import json
 
+import sys
+sys.path.append('../')
 # from func import update_routes
-import datafeed as df
-from datafeed import totalList as totalList
+import data.datafeed as df
+from data.datafeed import totalList as totalList
 import constants
 
 # Select all routes when no routes are selected
@@ -43,7 +44,7 @@ def getLatLonColor(route, selectedData, month, day):
 
 # Update Map Graph based on date-picker, selected data on histogram and location dropdown
 # @app.callback(
-#     Output("map-graph", "figure"),
+#     Output("map-graph-all", "figure"),
 #     [
 #         Input("route-selector", "value"),
 #         Input("date-picker", "date"),
@@ -51,48 +52,33 @@ def getLatLonColor(route, selectedData, month, day):
 #     ],
 # )
 def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_token):    
+    with open('data/geojson.json') as json_file:
+        geo_json = json.load(json_file)
+
     latInitial = 40.8167
     lonInitial = -73.9199
 
-    lats=[]
-    lons=[]
-    for feature in df.geo_json["features"]:
-        lats=np.append(lats, np.array(feature["geometry"]["coordinates"])[:, 1])
-        lons=np.append(lons, np.array(feature["geometry"]["coordinates"])[:, 0])
-        print ("*"*50)
-    print(pd.DataFrame(lats))
-    print(df.stop_lats)
-    print(type(lons))
-    print(type(df.stop_lons))
-
     fig = go.Figure(
+        data=[
             go.Scattermapbox(
-            lat=df.stop_lats,
-            lon=df.stop_lons,
-            # lat=pd.DataFrame(lats), # not working, why
-            # lon=pd.DataFrame(lons), # not working, why
-            mode='markers',
-            marker=go.scattermapbox.Marker(
-                size=9
-            ),
-            text=df.stop_names,
-        )
-        # data=[
-        #     go.Scattermapbox(
-        #         lat=np.array(feature["geometry"]["coordinates"])[:, 1],
-        #         lon=np.array(feature["geometry"]["coordinates"])[:, 0],
-        #         mode="lines",
-        #         line=dict(width=8, color="#F00")
-        #     )
-        #     for feature in df.geo_json["features"]
-        # ]
+                lat=np.array(feature["geometry"]["coordinates"])[:, 1], # MultiPoint
+                lon=np.array(feature["geometry"]["coordinates"])[:, 0],
+                mode='markers',
+                marker=go.scattermapbox.Marker(
+                    size=9
+                ),
+                text=np.array(feature["properties"]["names"]),
+            )
+            for feature in geo_json["features"]
+        ]
     )
   
     fig.update_layout(
         autosize=True,
-        margin=go.layout.Margin(l=0, r=35, t=0, b=0),
+        margin=go.layout.Margin(l=0, r=0, t=0, b=0),
         hovermode='closest',
         mapbox=dict(
+            style="stamen-terrain", 
             accesstoken=mapbox_access_token,
             bearing=0,
             center=dict(lat=latInitial, lon=lonInitial),
@@ -100,9 +86,18 @@ def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_toke
             zoom=12,
         ),
     )
+
     return fig
 
-
+# Update Map Graph based on date-picker, selected data on histogram and location dropdown
+# @app.callback(
+#     Output("map-graph", "figure"),
+#     [
+#         Input("route-selector", "value"),
+#         Input("date-picker", "date"),
+#         Input("hour-selector", "value"),
+#     ],
+# )
 def update_graph(routeSelected, datePicked, selectedData, mapbox_access_token):
     zoom = 12.0
     latInitial = 40.8167

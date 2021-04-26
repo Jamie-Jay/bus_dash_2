@@ -21,7 +21,7 @@ the following:
 
 ```bash
 python3 -m venv myvenv
-# source myvenv/bin/activate
+# source myvenv/bin/activate # Linux
 cd myvenv
 activate
 cd ..
@@ -33,9 +33,9 @@ Install the requirements:
 pip install -r requirements.txt
 ```
 
-Put `feb2021e149th.csv` file in the root folder
+Put `feb2021e149th.csv` file in the data folder
 
-Set environement variable:  
+<!-- Set environement variable:  
 Windows:
 ```
 set MAPBOX_API_KEY=<your map box access token>
@@ -43,12 +43,17 @@ set MAPBOX_API_KEY=<your map box access token>
 Linux:
 ```
 export MAPBOX_API_KEY=<your map box access token>
-```
+``` -->
 
 Run the app:
-
+1. Simulate backend data:
+- Create geojson for bus stops:
 ```
-python app.py
+python data/creategeojson.py
+```
+2. Run:
+```
+python index.py
 ```
 You can run the app on your browser at http://127.0.0.1:8050
 

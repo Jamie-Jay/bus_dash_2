@@ -2,7 +2,10 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from datetime import datetime as dt
-from datafeed import totalList as totalList
+
+import sys
+sys.path.append('../')
+from data.datafeed import totalList as totalList
 
 def date_picker_comp():
     return html.Div(

@@ -5,7 +5,7 @@ import numpy as np
 import geojson
 
 # Initialize data frame
-datafile='feb2021e149th.csv'
+datafile='data/feb2021e149th.csv'
 df=pd.read_csv(datafile, sep='\t', skiprows=1)
 
 # Get a dict containing lists of position counts per bus route, month, day
@@ -25,32 +25,6 @@ for df_route in df.groupby('route_short'):
     routeList = np.array(routeList,dtype=object)
     
     totalList[df_route[0]] = routeList
-
-## read stops file and get longtitude and latitude
-df_stop=pd.read_csv("stops.txt")
-stop_ids=df_stop['stop_id']
-stop_names=df_stop['stop_name']
-stop_lats=df_stop['stop_lat']
-stop_lons=df_stop['stop_lon']
-
-# convert to json
-# dump=None
-# for lat, lon in zip(stop_lats, stop_lons):
-#     dump = geojson.dumps(geojson.Point((lat, lon)), sort_keys=True)
-#     # geojson.loads(dump)
-
-geo_json =  { \
-  "type": "FeatureCollection", \
-  "features": [ \
-      {"type": "Feature", \
-              "geometry": { \
-                  "type": "MultiPoint", \
-                  "coordinates": [[lon, lat] \
-              for lon, lat in zip(stop_lats,stop_lons) ] }}]}
-geo_json_dic=geojson.dumps(geo_json)
-f = open('geojson.json','w')
-print (geo_json_dic, file=f)
-f.close()
 
 # # travel speed
 

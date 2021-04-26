@@ -4,14 +4,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
-from positions import Position
-from travelspeed import TravelSpeed
-from homepage import Homepage
+
+from pages.positions import Position
+from pages.travelspeed import TravelSpeed
+from pages.homepage import Homepage
+from pages.tabsbar import Tabsbar
 
 import components.graphs as graphs
 import components.controls as controls
-
-from tabsbar import Tabsbar
 
 tabs = Tabsbar()
 

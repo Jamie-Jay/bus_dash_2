@@ -3,6 +3,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
+import sys
+sys.path.append('../')
 import components.controls as controls
 import components.shows as shows
 import components.controls2 as controls2

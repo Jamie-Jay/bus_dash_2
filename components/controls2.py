@@ -4,16 +4,10 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 from datetime import datetime as dt
-from datafeed import totalList as totalList
 
-# bus route (checkbox)
-# date range (date picker)
-# time range (range slider)
-# day of week (check box)
-# exculde holidays (boolean switch)
-# route direction (drop down)
-# month of year ( check box)
-
+import sys
+sys.path.append('../')
+from data.datafeed import totalList as totalList
 
 route_selector = dbc.FormGroup(
     [
