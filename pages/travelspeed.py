@@ -1,5 +1,4 @@
 import dash
-import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
@@ -19,7 +18,7 @@ def TravelSpeed():
                         # Column for user controls
                         [
                             dbc.Label("Contol board"),
-                            controls2.form
+                            controls2.tabs
                         ],
                         # className='col-lg-6 col-md-6 col-xs-12 col-sm-12',
                         className='col-4',

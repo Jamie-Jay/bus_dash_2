@@ -2,6 +2,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 
+import json
+import numpy as np
+from plotly import graph_objs as go
+
+import constants
+import components.graphs as graphs
+
 def show_position_stat():                                            
     return html.Div(
       children=[
@@ -28,7 +35,10 @@ def show_mapbox_all():
     return html.Div(
               className="text-padding",
               children=[
-                  dcc.Graph(id="map-graph-all"),                                    
+                  dcc.Graph(
+                      id="map-graph-all", 
+                      figure=graphs.update_graph2()
+                      ),                                    
               ],
           )
 

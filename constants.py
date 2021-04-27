@@ -1,5 +1,8 @@
 # This file contains constants
 
+# Plotly mapbox public token
+mapbox_access_token = "pk.eyJ1IjoiamFtaWVqYXkiLCJhIjoiY2ttbW5oeG41MW1mYzJubnY4MXhmYm4zOSJ9.JvVgpcf7FpHVe-84FoHiUg"#os.getenv('MAPBOX_API_KEY')
+
 # Dictionary of important locations in New York
 list_of_locations = {
     "Madison Square Garden": {"lat": 40.7505, "lon": -73.9934},

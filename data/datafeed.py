@@ -2,7 +2,6 @@
 
 import pandas as pd
 import numpy as np
-import geojson
 
 # Initialize data frame
 datafile='data/feb2021e149th.csv'

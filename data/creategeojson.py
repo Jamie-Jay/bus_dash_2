@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import geojson
 
 ## read stops file and get longtitude and latitude

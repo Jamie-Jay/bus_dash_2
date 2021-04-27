@@ -1,22 +1,19 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash.dependencies import Input, Output
 
 from plotly import graph_objs as go
 from plotly.graph_objs import *
 from datetime import datetime as dt
 import numpy as np
-
-# from urllib.request import urlopen
 import pandas as pd
 import json
 
 import sys
 sys.path.append('../')
-# from func import update_routes
 import data.datafeed as df
 from data.datafeed import totalList as totalList
 import constants
+
+from app import app
 
 # Select all routes when no routes are selected
 def update_routes(routeSelected):
@@ -42,16 +39,16 @@ def getLatLonColor(route, selectedData, month, day):
             listStr += "(totalList[route][month][day].index.hour==" + str(int(time)) + ")]"
     return eval(listStr)
 
-# Update Map Graph based on date-picker, selected data on histogram and location dropdown
+# Static map for now - show bus positions
 # @app.callback(
 #     Output("map-graph-all", "figure"),
-#     [
-#         Input("route-selector", "value"),
-#         Input("date-picker", "date"),
-#         Input("hour-selector", "value"),
-#     ],
+    # [
+    #     Input("route-selector", "value"),
+    #     Input("date-picker", "date"),
+    #     Input("hour-selector", "value"),
+    # ],
 # )
-def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_token):    
+def update_graph2():    
     with open('data/geojson.json') as json_file:
         geo_json = json.load(json_file)
 
@@ -79,7 +76,7 @@ def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_toke
         hovermode='closest',
         mapbox=dict(
             style="stamen-terrain", 
-            accesstoken=mapbox_access_token,
+            accesstoken=constants.mapbox_access_token,
             bearing=0,
             center=dict(lat=latInitial, lon=lonInitial),
             pitch=0,
@@ -90,15 +87,15 @@ def update_graph2(datePicked, selectedData, selectedLocation, mapbox_access_toke
     return fig
 
 # Update Map Graph based on date-picker, selected data on histogram and location dropdown
-# @app.callback(
-#     Output("map-graph", "figure"),
-#     [
-#         Input("route-selector", "value"),
-#         Input("date-picker", "date"),
-#         Input("hour-selector", "value"),
-#     ],
-# )
-def update_graph(routeSelected, datePicked, selectedData, mapbox_access_token):
+@app.callback(
+    Output("map-graph", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("date-picker", "date"),
+        Input("hour-selector", "value"),
+    ],
+)
+def update_graph(routeSelected, datePicked, selectedData):
     zoom = 12.0
     latInitial = 40.8167
     lonInitial = -73.9199
@@ -163,7 +160,7 @@ def update_graph(routeSelected, datePicked, selectedData, mapbox_access_token):
         legend_title='<b> Route </b>',
         legend_title_font_color='white',
         mapbox=dict(
-            accesstoken=mapbox_access_token,
+            accesstoken=constants.mapbox_access_token,
             center=dict(lat=latInitial, lon=lonInitial),  # 40.7272  # -73.991251
             style="dark",
             bearing=bearing,
@@ -234,10 +231,10 @@ def get_selection(route, month, day, selection):
 
 
 # Update Histogram Figure based on Month, Day and Times Chosen
-# @app.callback(
-#     Output("histogram", "figure"),
-#     [Input("route-selector", "value"), Input("date-picker", "date"), Input("hour-selector", "value")],
-# )
+@app.callback(
+    Output("histogram", "figure"),
+    [Input("route-selector", "value"), Input("date-picker", "date"), Input("hour-selector", "value")],
+)
 def update_histogram(routeSelected, datePicked, selection):
     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
     monthPicked = date_picked.month - 4

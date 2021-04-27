@@ -2,10 +2,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from datetime import datetime as dt
+from dash.dependencies import Input, Output
 
 import sys
 sys.path.append('../')
 from data.datafeed import totalList as totalList
+
+from app import app
 
 def date_picker_comp():
     return html.Div(
@@ -64,11 +67,11 @@ def hour_selector_comp():
         ],
     )
 
-# # Selected Data in the Histogram updates the Values in the Hours selection dropdown menu
-# @app.callback(
-#     Output("hour-selector", "value"),
-#     [Input("histogram", "selectedData"), Input("histogram", "clickData")],
-# )
+# Selected Data in the Histogram updates the Values in the Hours selection dropdown menu
+@app.callback(
+    Output("hour-selector", "value"),
+    [Input("histogram", "selectedData"), Input("histogram", "clickData")],
+)
 def update_hour_selector(value, clickData):
     holder = []
     if clickData:
@@ -79,15 +82,15 @@ def update_hour_selector(value, clickData):
     return list(set(holder))
 
 
-# # Clear Selected Data if Click Data is used
-# @app.callback(Output("histogram", "selectedData"), [Input("histogram", "clickData")])
+# Clear Selected Data if Click Data is used
+@app.callback(Output("histogram", "selectedData"), [Input("histogram", "clickData")])
 def update_selected_data(clickData):
     if clickData:
         return {"points": []}
 
 
-# # Update the total number of positions Tag
-# @app.callback(Output("total-positions", "children"), [Input("date-picker", "date")])
+# Update the total number of positions Tag
+@app.callback(Output("total-positions", "children"), [Input("date-picker", "date")])
 def update_total_positions(datePicked):
     date_picked = dt.strptime(datePicked, "%Y-%m-%d")
 
@@ -108,11 +111,11 @@ def update_routes(routeSelected):
 
     return routeSelected
 
-# # Update the total number of positions in selected times
-# @app.callback(
-#     [Output("total-positions-selection", "children"), Output("date-value", "children")],
-#     [Input("route-selector", "value"), Input("date-picker", "date"), Input("hour-selector", "value")],
-# )
+# Update the total number of positions in selected times
+@app.callback(
+    [Output("total-positions-selection", "children"), Output("date-value", "children")],
+    [Input("route-selector", "value"), Input("date-picker", "date"), Input("hour-selector", "value")],
+)
 def update_total_positions_selection(routeSelected, datePicked, selection):
     firstOutput = ""
 
