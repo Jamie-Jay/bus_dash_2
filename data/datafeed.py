@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import datetime
 
 # Initialize data frame
 datafile='data/feb2021e149th.csv'
@@ -24,6 +25,36 @@ for df_route in df.groupby('route_short'):
     routeList = np.array(routeList,dtype=object)
     
     totalList[df_route[0]] = routeList
+
+def get_selected_data(routeSelected, direction, datePicked, selectedHour):
+    df_output = df
+
+    print(routeSelected)
+    if(routeSelected != None):
+        if(isinstance(routeSelected, list) == False): # compatible with radioItem and checklist
+            routeSelected = [routeSelected]
+        for route in routeSelected:
+            df_output = df_output[df_output['route_short']==route]
+    
+    print(direction)
+    if(direction != None):
+        for dr in direction:
+            df_output = df_output[df_output['direction']==dr]
+
+    print(datePicked)
+    print(selectedHour)
+    if(datePicked != None and selectedHour != None):
+        # get target time range
+        d = datetime.datetime.strptime(datePicked, '%Y-%m-%d')
+        start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
+        end_time = datetime.datetime(d.year, d.month, d.day, selectedHour[1])
+        
+        df_output['timestamp'] = df_output['timestamp'].astype('datetime64[ns]') # <class 'pandas._libs.tslibs.timestamps.Timestamp'> Pandas replacement for datetime.datetime
+        df_output = df_output[df_output['timestamp']>=pd.Timestamp(start_time)][df_output['timestamp']<pd.Timestamp(end_time)]
+        df_output['timestamp'] = df_output['timestamp'].astype('str')
+
+
+    return df_output
 
 # # travel speed
 

@@ -24,7 +24,7 @@ route_selector = dbc.FormGroup(
                 }
                 for route in totalList.keys()
             ],
-            # inline=True,
+            labelStyle={'display': 'inline-block'}
         ),
     ]
 )
@@ -66,9 +66,9 @@ time_range = dbc.FormGroup(
         dbc.Label("Time of a day", html_for="range-slider", className='h3'),
         dcc.RangeSlider(
             id="hour-range-selector", 
-            min=0, max=23, 
+            min=0, max=24, 
             value=[6, 8], 
-            marks={i: str(i) for i in range(0, 24)}
+            marks={i: str(i) for i in range(0, 25)}
         ),
         dbc.RadioItems(
             id="time-selector-special",
@@ -78,6 +78,7 @@ time_range = dbc.FormGroup(
                 {"label": "school dismissal time(3-4pm)", "value": 3},
                 {"label": "night time(8pm-11pm)", "value": 4,},
                 {"label": "owl period(0am-6am)", "value": 5,},
+                {"label": "all day", "value": 6,},
             ],
             value=[],
             inline=True,
@@ -109,6 +110,7 @@ day_range = dbc.FormGroup(
                 {"label": "Weekend only", "value": 2},
                 {"label": "Saturday", "value": 3},
                 {"label": "Sunday", "value": 4},
+                {"label": "All week", "value": 5},
             ],
             value=[],
             inline=True,
@@ -212,6 +214,8 @@ def time_special_change(radio_items_value):
         return [20, 23]
     elif radio_items_value == 5: # owl period(0am-6am)
         return [0, 6]
+    elif radio_items_value == 6: # all day
+        return [0, 24]
     return [8, 10]
 
 # day tab relationship
@@ -230,4 +234,6 @@ def time_special_change(radio_items_value):
         return [6]
     elif radio_items_value == 4: # Sunday
         return [7]
+    elif radio_items_value == 5: # All weekday
+        return [1, 2, 3, 4, 5, 6, 7]
     return [1]

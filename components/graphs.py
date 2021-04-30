@@ -2,6 +2,8 @@ from dash.dependencies import Input, Output
 
 from plotly import graph_objs as go
 from plotly.graph_objs import *
+import plotly.express as px
+
 from datetime import datetime as dt
 import numpy as np
 import pandas as pd
@@ -11,6 +13,7 @@ import sys
 sys.path.append('../')
 import data.datafeed as df
 from data.datafeed import totalList as totalList
+from data.datafeed import get_selected_data as get_selected_data
 import constants
 
 from app import app
@@ -41,14 +44,14 @@ def getLatLonColor(route, selectedData, month, day):
 
 # Static map for now - show bus positions
 # @app.callback(
-#     Output("map-graph-all", "figure"),
+#     Output("map-graph-static", "figure"),
     # [
     #     Input("route-selector", "value"),
     #     Input("date-picker", "date"),
     #     Input("hour-selector", "value"),
     # ],
 # )
-def update_graph2():    
+def update_graph_static():    
     with open('data/geojson.json') as json_file:
         geo_json = json.load(json_file)
 
@@ -82,6 +85,40 @@ def update_graph2():
             pitch=0,
             zoom=12,
         ),
+        height=600
+    )
+
+    return fig
+
+# Static map for now - show bus positions
+@app.callback(
+    Output("map-graph-animated", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("route-d-selector", "value"),
+        Input("date-picker", "date"),
+        Input("hour-range-selector", "value"),
+    ],
+)
+def update_graph_animated(routeSelected, direction, datePicked, selectedHour):
+    df_animated = get_selected_data(routeSelected, direction, datePicked, selectedHour)
+    print(df_animated.shape)
+
+    fig = px.scatter_mapbox(df_animated, lon="lon", lat="lat", animation_frame="timestamp",
+           size="bearing", color="route_short", hover_name="destination_name",
+    #            log_x=True, size_max=55, range_x=[73,74], range_y=[40.8, 40.9]
+                        )
+
+    fig.update_layout(
+        margin={"r":0,"t":0,"l":0,"b":0},
+        mapbox=go.layout.Mapbox(
+            style="stamen-terrain", 
+            zoom=12, 
+            center_lat = 40.8167,
+            center_lon = -73.90544,
+        ),
+        # width=800,
+        height=600,
     )
 
     return fig

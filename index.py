@@ -4,6 +4,7 @@ from dash.dependencies import Input, Output
 
 from pages.positions import Position
 from pages.travelspeed import TravelSpeed
+from pages.animation import Animation
 from pages.homepage import Homepage
 from pages.tabsbar import Tabsbar
 
@@ -20,6 +21,8 @@ def switch_tab(at):
         return Position()
     elif at == "travelspeed":
         return TravelSpeed()
+    elif at == "animation":
+        return Animation()
     return html.P("This shouldn't ever be displayed...")
 
 if __name__ == '__main__':

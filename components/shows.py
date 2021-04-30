@@ -31,13 +31,24 @@ def show_mapbox():
               ],
           )
 
-def show_mapbox_all():                                            
+def show_mapbox_static():                                            
     return html.Div(
               className="text-padding",
               children=[
                   dcc.Graph(
-                      id="map-graph-all", 
-                      figure=graphs.update_graph2()
+                      id="map-graph-static", 
+                      figure=graphs.update_graph_static()
+                      ),                                    
+              ],
+          )
+
+def show_mapbox_animated():                                            
+    return html.Div(
+              className="text-padding",
+              children=[
+                  dcc.Graph(
+                      id="map-graph-animated", 
+                    #   figure=graphs.update_graph_animated()
                       ),                                    
               ],
           )
