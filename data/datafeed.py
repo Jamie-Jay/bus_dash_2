@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 import datetime
+from geopy.distance import geodesic
 
 # Initialize data frame
 datafile='data/feb2021e149th.csv'
@@ -29,21 +30,21 @@ for df_route in df.groupby('route_short'):
 def get_selected_data(routeSelected, direction, datePicked, selectedHour):
     df_output = df
 
-    print(routeSelected)
+    # print(routeSelected)
     if(routeSelected != None):
         if(isinstance(routeSelected, list) == False): # compatible with radioItem and checklist
             routeSelected = [routeSelected]
         for route in routeSelected:
             df_output = df_output[df_output['route_short']==route]
     
-    print(direction)
+    # print(direction)
     if(direction != None):
         for dr in direction:
             df_output = df_output[df_output['direction']==dr]
 
-    print(datePicked)
-    print(selectedHour)
-    if(datePicked != None and selectedHour != None):
+    # print(datePicked)
+    # print(selectedHour)
+    if(datePicked != None and selectedHour != None): # TODO: support multiple datePicked
         # get target time range
         d = datetime.datetime.strptime(datePicked, '%Y-%m-%d')
         start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
@@ -54,7 +55,55 @@ def get_selected_data(routeSelected, direction, datePicked, selectedHour):
         df_output['timestamp'] = df_output['timestamp'].astype('str')
 
 
-    return df_output
+    return create_bus_speed_df(df_output)
+
+def calc_mph(coord1, coord2, time1, time2):
+    if pd.isnull(time2):
+        return
+    else:
+        dist = float(geodesic(coord1, coord2).miles)
+        # hrs = float(pd.Timedelta(time2-time1).total_seconds()) / (60.0 * 60.0)  # divide by 60 * 60 for hours
+        d1 = datetime.datetime.strptime(time1, '%Y-%m-%d %H:%M:%S')
+        d2 = datetime.datetime.strptime(time2, '%Y-%m-%d %H:%M:%S')
+        hrs = (d2-d1).seconds / (60.0 * 60.0)
+        
+        if (hrs == 0):
+            print (coord1, coord2, time1, time2)
+        return dist / hrs
+
+def calc_mph_df(df_input):
+    df_input_shifted = df_input.shift(periods=1)
+
+    # merge timestamp, lat, and lon columns from shifted df to non-shifted df
+    df_input_mph = df_input.merge(df_input_shifted[['timestamp', 'lat', 'lon']],
+                                                    how='inner', left_index=True, right_index=True,
+                                                    suffixes=('', '_next'))
+
+
+    df_input_mph['mph'] = df_input_mph.apply(lambda x:
+                                            calc_mph(coord1=(x['lat'], x['lon']),
+                                                    coord2=(x['lat_next'], x['lon_next']),
+                                                    time1=x['timestamp'],
+                                                    time2=x['timestamp_next']), axis=1)
+    # fill in the first row's speed as the same as the second row
+    if(df_input_mph.shape[0] > 1):
+        df_input_mph.iloc[0,-1] = df_input_mph.iloc[1,-1]
+    
+    return df_input_mph
+
+def create_bus_speed_df(df_input):
+    df_input.sort_values(by="timestamp" , ascending=False)
+    
+    join_cols = df_input.columns.values.tolist()
+    join_cols.append('mph')
+    df_join = pd.DataFrame(columns=join_cols)
+
+    for vh in set(df_input['vehicle_id'].values):
+        vh_df = df_input[df_input['vehicle_id']==vh]
+        vh_df_mph = calc_mph_df(vh_df)
+        df_join = pd.concat([df_join,vh_df_mph],axis=0)
+
+    return df_join
 
 # # travel speed
 

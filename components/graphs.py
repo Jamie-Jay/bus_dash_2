@@ -102,10 +102,10 @@ def update_graph_static():
 )
 def update_graph_animated(routeSelected, direction, datePicked, selectedHour):
     df_animated = get_selected_data(routeSelected, direction, datePicked, selectedHour)
-    print(df_animated.shape)
+    # print(df_animated.shape) # TODO: add the count info to webpage
 
     fig = px.scatter_mapbox(df_animated, lon="lon", lat="lat", animation_frame="timestamp",
-           size="bearing", color="route_short", hover_name="destination_name",
+           size="mph", color="route_short", hover_name="destination_name", size_max=55
     #            log_x=True, size_max=55, range_x=[73,74], range_y=[40.8, 40.9]
                         )
 
@@ -115,7 +115,7 @@ def update_graph_animated(routeSelected, direction, datePicked, selectedHour):
             style="stamen-terrain", 
             zoom=12, 
             center_lat = 40.8167,
-            center_lon = -73.90544,
+            center_lon = -73.9199,
         ),
         # width=800,
         height=600,
