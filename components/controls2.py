@@ -191,7 +191,7 @@ tabs = dbc.Tabs(
         dbc.Tab(tab2_content, label="Time filter"),
         dbc.Tab(
             # "This tab's content is never seen", 
-            tab3_content, label="Aggregrate", disabled=False
+            tab3_content, label="Aggregrate", disabled=True
         ),
     ]
 )

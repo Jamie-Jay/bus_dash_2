@@ -8,7 +8,7 @@ import components.controls as controls
 import components.shows as shows
 import components.controls2 as controls2
 
-def TravelSpeed():
+def MainPage():
     # Layout of Dash App
     layout = html.Div(
         [
@@ -27,8 +27,8 @@ def TravelSpeed():
                     dbc.Col(
                         # Column for map
                         [# Column for app graphs and plots
-                            dbc.Label("Static Map"),
-                            shows.show_mapbox_static()
+                            dbc.Label("Animated Map"),
+                            shows.show_mapbox_animated()                            
                         ],
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
                         className='col-8',
@@ -36,20 +36,6 @@ def TravelSpeed():
                     ),
                 ]
             ),
-            # dbc.Row(
-            #     [
-            #         dbc.Col(
-            #             # Column for map
-            #             [# Column for app graphs and plots
-            #                 dbc.Label("Animated Map"),
-            #                 shows.show_mapbox_animated()
-            #             ],
-            #             # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
-            #             # className='col-8',
-            #             # style={"margin": '0px', 'padding':'0px'}
-            #         ),
-            #     ]
-            # ),
             dbc.Row(
                 [
                     dbc.Col(

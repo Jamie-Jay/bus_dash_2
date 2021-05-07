@@ -6,8 +6,11 @@ import datetime
 from geopy.distance import geodesic
 
 # Initialize data frame
-datafile='data/feb2021e149th.csv'
-df=pd.read_csv(datafile, sep='\t', skiprows=1)
+# datafile='data/feb2021e149th.csv'
+datafile='data/feb2021e149th_Bx19_processed.csv'
+# df=pd.read_csv(datafile, sep='\t', skiprows=1)
+df=pd.read_csv(datafile)
+# new cols: dwelling, bunch_flag, mph
 
 # Get a dict containing lists of position counts per bus route, month, day
 totalList = {}
@@ -27,7 +30,7 @@ for df_route in df.groupby('route_short'):
     
     totalList[df_route[0]] = routeList
 
-def get_selected_data(routeSelected, direction, datePicked, selectedHour):
+def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour):
     df_output = df
 
     # print(routeSelected)
@@ -42,20 +45,34 @@ def get_selected_data(routeSelected, direction, datePicked, selectedHour):
         for dr in direction:
             df_output = df_output[df_output['direction']==dr]
 
-    # print(datePicked)
+    # print(startDate, endDate)
     # print(selectedHour)
-    if(datePicked != None and selectedHour != None): # TODO: support multiple datePicked
+    if(startDate!= None and endDate != None and selectedHour != None): # TODO: support multiple datePicked
         # get target time range
-        d = datetime.datetime.strptime(datePicked, '%Y-%m-%d')
-        start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
-        end_time = datetime.datetime(d.year, d.month, d.day, selectedHour[1])
-        
+        d_s = datetime.datetime.strptime(startDate[:len('2021-02-15')], '%Y-%m-%d')
+        d_e = datetime.datetime.strptime(endDate[:len('2021-02-15')], '%Y-%m-%d')
+
         df_output['timestamp'] = df_output['timestamp'].astype('datetime64[ns]') # <class 'pandas._libs.tslibs.timestamps.Timestamp'> Pandas replacement for datetime.datetime
-        df_output = df_output[df_output['timestamp']>=pd.Timestamp(start_time)][df_output['timestamp']<pd.Timestamp(end_time)]
+
+        d = d_s
+        delta = datetime.timedelta(days=1)
+        join_cols = df_output.columns.values.tolist()
+        df_join = pd.DataFrame(columns=join_cols)
+        while d <= d_e:
+            # print (d.strftime("%Y-%m-%d"))
+            start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
+            end_time = datetime.datetime(d.year, d.month, d.day, selectedHour[1])
+            print(start_time, end_time)
+            df_output_d = df_output[df_output['timestamp']>=pd.Timestamp(start_time)]
+            df_output_d = df_output_d[df_output_d['timestamp']<pd.Timestamp(end_time)]
+
+            df_join = pd.concat([df_join,df_output_d],axis=0)
+            d += delta
+
+        df_output=df_join
         df_output['timestamp'] = df_output['timestamp'].astype('str')
 
-
-    return create_bus_speed_df(df_output)
+    return (df_output)
 
 def calc_mph(coord1, coord2, time1, time2):
     if pd.isnull(time2):
@@ -104,6 +121,11 @@ def create_bus_speed_df(df_input):
         df_join = pd.concat([df_join,vh_df_mph],axis=0)
 
     return df_join
+
+# df_output = create_bus_speed_df(df)
+# df_output.to_csv('newdf.csv')
+
+
 
 # # travel speed
 

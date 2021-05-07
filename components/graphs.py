@@ -96,17 +96,21 @@ def update_graph_static():
     [
         Input("route-selector", "value"),
         Input("route-d-selector", "value"),
-        Input("date-picker", "date"),
+        Input("date-picker", "start_date"),
+        Input("date-picker", "end_date"),
         Input("hour-range-selector", "value"),
     ],
 )
-def update_graph_animated(routeSelected, direction, datePicked, selectedHour):
-    df_animated = get_selected_data(routeSelected, direction, datePicked, selectedHour)
+def update_graph_animated(routeSelected, direction, startDate, endDate, selectedHour):
+    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
     # print(df_animated.shape) # TODO: add the count info to webpage
+    df_animated['mph']= df_animated['mph'].fillna(0)
+    # user care more about slow speed, use 1/mph to show speed
+    df_animated["1/mph"] = 1 / df_animated["mph"]
+    df_animated['1/mph'][np.isinf(df_animated['1/mph'])] = 0
 
     fig = px.scatter_mapbox(df_animated, lon="lon", lat="lat", animation_frame="timestamp",
-           size="mph", color="route_short", hover_name="destination_name", size_max=55
-    #            log_x=True, size_max=55, range_x=[73,74], range_y=[40.8, 40.9]
+           size="1/mph", color="route_short", hover_name="destination_name", size_max=55
                         )
 
     fig.update_layout(

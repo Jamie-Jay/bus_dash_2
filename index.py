@@ -2,9 +2,9 @@ import dash
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from pages.positions import Position
-from pages.travelspeed import TravelSpeed
-from pages.animation import Animation
+# from pages.positions import Position
+from pages.mainpage import MainPage
+from pages.appendix import Appendix
 from pages.homepage import Homepage
 from pages.tabsbar import Tabsbar
 
@@ -17,12 +17,12 @@ app.layout = tabs
 def switch_tab(at):
     if at == "about":
         return Homepage(app.get_asset_url("cornell-logo.png"))
-    elif at == "positions":
-        return Position()
-    elif at == "travelspeed":
-        return TravelSpeed()
-    elif at == "animation":
-        return Animation()
+    # elif at == "positions":
+    #     return Position()
+    elif at == "mainpage":
+        return MainPage()
+    elif at == "appendix":
+        return Appendix()
     return html.P("This shouldn't ever be displayed...")
 
 if __name__ == '__main__':
