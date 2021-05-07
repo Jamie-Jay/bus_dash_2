@@ -28,7 +28,7 @@ def MainPage():
                         # Column for map
                         [# Column for app graphs and plots
                             dbc.Label("Animated Map"),
-                            shows.show_mapbox_animated()                            
+                            shows.show_mapbox_animated()
                         ],
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
                         className='col-8',
@@ -59,7 +59,7 @@ def MainPage():
                     dbc.Col(
                         # Column for dwell time
                         [
-                            shows.show_burnchart()
+                            shows.show_dwell_time()
                         ],
                         className='col-4',
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',

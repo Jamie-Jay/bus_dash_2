@@ -30,8 +30,10 @@ for df_route in df.groupby('route_short'):
     
     totalList[df_route[0]] = routeList
 
+# support both single date and date range
+# single date: endDate is None
 def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour):
-    df_output = df
+    df_output = df.copy(deep=True)
 
     # print(routeSelected)
     if(routeSelected != None):
@@ -47,30 +49,38 @@ def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour
 
     # print(startDate, endDate)
     # print(selectedHour)
-    if(startDate!= None and endDate != None and selectedHour != None): # TODO: support multiple datePicked
-        # get target time range
+    if(startDate!= None and selectedHour != None): # TODO: support multiple datePicked
         d_s = datetime.datetime.strptime(startDate[:len('2021-02-15')], '%Y-%m-%d')
-        d_e = datetime.datetime.strptime(endDate[:len('2021-02-15')], '%Y-%m-%d')
-
         df_output['timestamp'] = df_output['timestamp'].astype('datetime64[ns]') # <class 'pandas._libs.tslibs.timestamps.Timestamp'> Pandas replacement for datetime.datetime
 
-        d = d_s
-        delta = datetime.timedelta(days=1)
-        join_cols = df_output.columns.values.tolist()
-        df_join = pd.DataFrame(columns=join_cols)
-        while d <= d_e:
-            # print (d.strftime("%Y-%m-%d"))
-            start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
-            end_time = datetime.datetime(d.year, d.month, d.day, selectedHour[1])
-            print(start_time, end_time)
-            df_output_d = df_output[df_output['timestamp']>=pd.Timestamp(start_time)]
-            df_output_d = df_output_d[df_output_d['timestamp']<pd.Timestamp(end_time)]
+        if (endDate != None): # date range
+            # get target time range
+            d_e = datetime.datetime.strptime(endDate[:len('2021-02-15')], '%Y-%m-%d')
 
-            df_join = pd.concat([df_join,df_output_d],axis=0)
-            d += delta
+            d = d_s
+            delta = datetime.timedelta(days=1)
+            join_cols = df_output.columns.values.tolist()
+            df_join = pd.DataFrame(columns=join_cols)
+            while d <= d_e:
+                # print (d.strftime("%Y-%m-%d"))
+                start_time = datetime.datetime(d.year, d.month, d.day, selectedHour[0])
+                end_time = datetime.datetime(d.year, d.month, d.day, selectedHour[1])
+                # print(start_time, end_time)
+                df_output_d = df_output[df_output['timestamp']>=pd.Timestamp(start_time)]
+                df_output_d = df_output_d[df_output_d['timestamp']<pd.Timestamp(end_time)]
 
-        df_output=df_join
+                df_join = pd.concat([df_join,df_output_d],axis=0)
+                d += delta
+
+            df_output = df_join
+        else: # single range
+            start_time = datetime.datetime(d_s.year, d_s.month, d_s.day, selectedHour[0])
+            end_time = datetime.datetime(d_s.year, d_s.month, d_s.day, selectedHour[1])
+            df_output = df_output[df_output['timestamp']>=pd.Timestamp(start_time)][df_output['timestamp']<pd.Timestamp(end_time)]
+
         df_output['timestamp'] = df_output['timestamp'].astype('str')
+
+    # print(df_output.shape)
 
     return (df_output)
 

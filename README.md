@@ -33,7 +33,8 @@ Install the requirements:
 pip install -r requirements.txt
 ```
 
-Put `feb2021e149th.csv` file in the data folder
+<!-- Put `feb2021e149th.csv` file in the data folder -->
+Put `feb2021e149th_Bx19_processed.csv` file in the `./data` folder
 
 <!-- Set environement variable:  
 Windows:

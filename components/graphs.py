@@ -90,7 +90,7 @@ def update_graph_static():
 
     return fig
 
-# Static map for now - show bus positions
+# Show travel speed for now
 @app.callback(
     Output("map-graph-animated", "figure"),
     [
@@ -125,6 +125,86 @@ def update_graph_animated(routeSelected, direction, startDate, endDate, selected
         height=600,
     )
 
+    return fig
+
+# Show travel speed histo
+@app.callback(
+    Output("histogram2", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("route-d-selector", "value"),
+        Input("date-picker", "start_date"),
+        Input("date-picker", "end_date"),
+        Input("hour-range-selector", "value"),
+    ],
+)
+def update_travel_speed(routeSelected, direction, startDate, endDate, selectedHour):
+    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
+    data = [
+        go.Histogram(
+            x = df_animated['mph'],
+            # histnorm = 'probability' # default: count
+        )
+    ]
+
+    fig = go.Figure(data=data)
+    return fig
+
+
+# Show bunching histo
+@app.callback(
+    Output("heatmap", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("route-d-selector", "value"),
+        Input("date-picker", "start_date"),
+        Input("date-picker", "end_date"),
+        Input("hour-range-selector", "value"),
+    ],
+)
+def update_bunching(routeSelected, direction, startDate, endDate, selectedHour):
+    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
+    # more data needed to show heatmap: stop_id, time-hour
+    # use radioitems to select date
+    # fig = go.Figure(data=go.Heatmap(
+    #         z=df_animated['bunch_count'],
+    #         x=df_animated['service_date'],
+    #         y=df_animated['destination_name'],
+    #         colorscale='Viridis'))
+
+    # show histo for now
+    data = [
+        go.Histogram(
+            x = df_animated['bunch_count'],
+            # histnorm = 'probability' # default: count
+        )
+    ]
+    fig = go.Figure(data=data)
+    return fig
+
+# Show if dwelling histo
+@app.callback(
+    Output("burndownchart", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("route-d-selector", "value"),
+        Input("date-picker", "start_date"),
+        Input("date-picker", "end_date"),
+        Input("hour-range-selector", "value"),
+    ],
+)
+def update_dwell_time(routeSelected, direction, startDate, endDate, selectedHour):
+    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
+    # more data needed to show heatmap: dwell time
+
+    # only have if dewlling info - show histo for now
+    data = [
+        go.Histogram(
+            x = df_animated['dwelling'],
+            # histnorm = 'probability' # default: count
+        )
+    ]
+    fig = go.Figure(data=data)
     return fig
 
 # Update Map Graph based on date-picker, selected data on histogram and location dropdown

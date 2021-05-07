@@ -80,7 +80,7 @@ def show_bunching():
               ],
     )
 
-def show_burnchart():                                            
+def show_dwell_time():                                            
     return html.Div(
               className="text-padding",
               children=[

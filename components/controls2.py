@@ -54,6 +54,7 @@ date_range = dbc.FormGroup(
             start_date=dt(2021, 2, 14),
             end_date=dt(2021, 2, 15),
             display_format="MMMM D, YYYY",
+            minimum_nights=0, # allow picking one day
             # calendar_orientation='vertical',
             style={"border": "0px solid black", 'background-color':'#000000'},
         )
