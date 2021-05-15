@@ -9,7 +9,7 @@ from plotly import graph_objs as go
 import constants
 import components.graphs as graphs
 
-def show_position_stat():                                            
+def show_position_stat():
     return html.Div(
       children=[
         html.P(
@@ -22,7 +22,7 @@ def show_position_stat():
     )
 
 
-def show_mapbox():                                            
+def show_mapbox():
     return html.Div(
               className="text-padding",
               children=[
@@ -31,7 +31,7 @@ def show_mapbox():
               ],
           )
 
-def show_mapbox_static():                                            
+def show_mapbox_static():
     return html.Div(
               className="text-padding",
               children=[
@@ -42,7 +42,7 @@ def show_mapbox_static():
               ],
           )
 
-def show_mapbox_animated():                                            
+def show_mapbox_animated():
     return html.Div(
               className="text-padding",
               children=[
@@ -53,38 +53,38 @@ def show_mapbox_animated():
               ],
           )
 
-def show_histogram():                                            
+def show_histogram():
     return html.Div(
               className="text-padding",
               children=[
-                  html.P("travel speed"),
+                  html.P("Bus Position Count"),
                   dcc.Graph(id="histogram"), 
               ],
     )
 
-def show_travel_speed():                                            
+def show_travel_speed():
     return html.Div(
               className="text-padding",
               children=[
-                  html.P("travel speed"),
-                  dcc.Graph(id="histogram2"), 
+                  html.P("HeatMap - Travel Speed (mph)"),
+                  dcc.Graph(id="speedHeatMap"), 
               ],
     )
 
-def show_bunching():                                            
+def show_bunching():
     return html.Div(
               className="text-padding",
               children=[
-                  html.P("bunching"),
-                  dcc.Graph(id="heatmap"), 
+                  html.P("HeatMap - Bunching Count"),
+                  dcc.Graph(id="bunchingHeatMap"), 
               ],
     )
 
-def show_dwell_time():                                            
+def show_dwell_time():
     return html.Div(
               className="text-padding",
               children=[
-                  html.P("dwell time"),
-                  dcc.Graph(id="burndownchart"), 
+                  html.P("HeatMap - If Dwelling (1 represents it is dwelling)"),
+                  dcc.Graph(id="dwellingHeatMap"), 
               ],
     )

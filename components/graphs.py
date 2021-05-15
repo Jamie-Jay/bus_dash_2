@@ -14,6 +14,8 @@ sys.path.append('../')
 import data.datafeed as df
 from data.datafeed import totalList as totalList
 from data.datafeed import get_selected_data as get_selected_data
+from data.datafeed import add_distance as add_distance
+from data.datafeed import get_selected_time as get_selected_time
 import constants
 
 from app import app
@@ -129,82 +131,190 @@ def update_graph_animated(routeSelected, direction, startDate, endDate, selected
 
 # Show travel speed histo
 @app.callback(
-    Output("histogram2", "figure"),
     [
-        Input("route-selector", "value"),
-        Input("route-d-selector", "value"),
+        Output("time-options", "options"), 
+        Output("time-options", "value")
+    ],
+    [
         Input("date-picker", "start_date"),
         Input("date-picker", "end_date"),
         Input("hour-range-selector", "value"),
     ],
 )
-def update_travel_speed(routeSelected, direction, startDate, endDate, selectedHour):
-    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
-    data = [
-        go.Histogram(
-            x = df_animated['mph'],
-            # histnorm = 'probability' # default: count
-        )
-    ]
+def update_time_radioitems(startDate, endDate, selectedHour):
+    hours = get_selected_time(startDate, endDate, selectedHour)
+    # df_time = df_animated[]
+    options=[{'label': x, 'value': x} 
+              for x in hours]
+    return options, hours[0]
 
-    fig = go.Figure(data=data)
+def get_time_option_data(routeSelected, direction, timeOption):
+    target = dt.strptime(timeOption, '%Y-%m-%d-%H')
+    start_Date = target.strftime("%Y-%m-%d")
+    end_Date = None
+    time_option = [target.hour, target.hour+1]
+
+    df_timeOption = get_selected_data(routeSelected, direction, start_Date, end_Date, time_option)
+
+    return df_timeOption
+
+def update_heatmap_layout(fig):
+    fig.update_layout(
+        xaxis = dict(
+            #color='#444',
+            title=dict(
+                text='Timestamp',# 标题的文字
+                font = dict(
+                    #  family = '',  # 字体 比如宋体
+                        size = 12,    # 标题大小   
+                    #  color = '',   # 在此处可以只设置标题的颜色
+                        ),
+                standoff = 1, # 设置标题和标签的距离，大于等于0的数字，注意标题是不会超出页边的   
+            ),
+            showgrid=False,
+        ),
+        yaxis = dict(
+            #color='#444',
+            title=dict(
+                text='Distance(Miles)',# 标题的文字
+                font = dict(
+                    #  family = '',  # 字体 比如宋体
+                        size = 12,    # 标题大小   
+                    #  color = '',   # 在此处可以只设置标题的颜色
+                        ),
+                standoff = 1, # 设置标题和标签的距离，大于等于0的数字，注意标题是不会超出页边的   
+            ),
+            showgrid=False,
+        ),
+        showlegend=False,
+        plot_bgcolor="#323130",
+        paper_bgcolor="#323130",
+        dragmode="select",
+        font=dict(color="white"),
+        margin=go.layout.Margin(l=50, r=50, t=50, b=50),
+    )
+    # layout = go.Layout(
+    #         bargap=0.01,
+    #         bargroupgap=0,
+    #         barmode="group",
+    #         margin=go.layout.Margin(l=10, r=0, t=0, b=50),
+    #         showlegend=False,
+    #         plot_bgcolor="#323130",
+    #         paper_bgcolor="#323130",
+    #         dragmode="select",
+    #         font=dict(color="white"),
+    #         xaxis=dict(
+    #             # range=[-0.5, 23.5],
+    #             showgrid=False,
+    #             nticks=25,
+    #             fixedrange=True,
+    #             ticksuffix=":00",
+    #         ),
+    #         yaxis=dict(
+    #             # range=[0, max(yVals) + max(yVals) / 4],
+    #             showticklabels=False,
+    #             showgrid=False,
+    #             fixedrange=True,
+    #             rangemode="nonnegative",
+    #             zeroline=False,
+    #         ),
+    #         annotations=[
+    #             dict(
+    #                 x=xi,
+    #                 y=yi,
+    #                 text=str(yi),
+    #                 xanchor="center",
+    #                 yanchor="bottom",
+    #                 showarrow=False,
+    #                 font=dict(color="white"),
+    #             )
+    #             for xi, yi in zip(xVals, yVals)
+    #         ],
+    #     )
+
+# Show travel speed heatmap
+@app.callback(
+    Output("speedHeatMap", "figure"),
+    [
+        Input("route-selector", "value"),
+        Input("route-d-selector", "value"),
+        Input("time-options", "value"),
+    ],
+)
+def update_travel_speed(routeSelected, direction, timeOption):
+
+    df_timeOption = get_time_option_data(routeSelected, direction, timeOption)
+    df_timeOption = add_distance(df_timeOption)
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=df_timeOption['mph'],
+            x=df_timeOption['timestamp'],
+            y=df_timeOption['distance'],
+            colorscale='deep')
+        )
+
+    # title='HeatMap - Travel Speed (mph)',
+    update_heatmap_layout(fig)
+
     return fig
 
 
-# Show bunching histo
+# Show bunching heatmap
 @app.callback(
-    Output("heatmap", "figure"),
+    Output("bunchingHeatMap", "figure"),
     [
         Input("route-selector", "value"),
         Input("route-d-selector", "value"),
-        Input("date-picker", "start_date"),
-        Input("date-picker", "end_date"),
-        Input("hour-range-selector", "value"),
+        Input("time-options", "value"),
     ],
 )
-def update_bunching(routeSelected, direction, startDate, endDate, selectedHour):
-    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
-    # more data needed to show heatmap: stop_id, time-hour
-    # use radioitems to select date
-    # fig = go.Figure(data=go.Heatmap(
-    #         z=df_animated['bunch_count'],
-    #         x=df_animated['service_date'],
-    #         y=df_animated['destination_name'],
-    #         colorscale='Viridis'))
+def update_bunching(routeSelected, direction, timeOption):
 
-    # show histo for now
-    data = [
-        go.Histogram(
-            x = df_animated['bunch_count'],
-            # histnorm = 'probability' # default: count
+    df_timeOption = get_time_option_data(routeSelected, direction, timeOption)
+    # df_timeOption = df_timeOption[df_timeOption['bunch_count']!=0] # do not show 0 bunching, or show 0 as grey color
+    df_timeOption = add_distance(df_timeOption)
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=df_timeOption['bunch_count'],
+            x=df_timeOption['timestamp'],
+            y=df_timeOption['distance'],
+            colorscale='deep')
         )
-    ]
-    fig = go.Figure(data=data)
+
+    # title='HeatMap - Bunching Count',
+    update_heatmap_layout(fig)
+
     return fig
 
-# Show if dwelling histo
+# Show if dwelling heatmap
 @app.callback(
-    Output("burndownchart", "figure"),
+    Output("dwellingHeatMap", "figure"),
     [
         Input("route-selector", "value"),
         Input("route-d-selector", "value"),
-        Input("date-picker", "start_date"),
-        Input("date-picker", "end_date"),
-        Input("hour-range-selector", "value"),
+        Input("time-options", "value"),
     ],
 )
-def update_dwell_time(routeSelected, direction, startDate, endDate, selectedHour):
-    df_animated = get_selected_data(routeSelected, direction, startDate, endDate, selectedHour)
-    # more data needed to show heatmap: dwell time
+def update_dwell_time(routeSelected, direction, timeOption):
+    
+    df_timeOption = get_time_option_data(routeSelected, direction, timeOption)
+    df_timeOption = add_distance(df_timeOption)
+    df_timeOption['dwelling'] = df_timeOption['dwelling'].astype('int') # change False to 0, True to 1
 
-    # only have if dewlling info - show histo for now
-    data = [
-        go.Histogram(
-            x = df_animated['dwelling'],
-            # histnorm = 'probability' # default: count
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=df_timeOption['dwelling'],
+            x=df_timeOption['timestamp'],
+            y=df_timeOption['distance'],
+            colorscale='deep'
         )
-    ]
-    fig = go.Figure(data=data)
+    )
+
+    # title='HeatMap - If Dwelling (1 represents it is dwelling)', 
+    update_heatmap_layout(fig)
+
     return fig
 
 # Update Map Graph based on date-picker, selected data on histogram and location dropdown

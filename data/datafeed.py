@@ -30,6 +30,29 @@ for df_route in df.groupby('route_short'):
     
     totalList[df_route[0]] = routeList
 
+def get_selected_time(startDate, endDate, selectedHour):
+    times = []
+
+    if(startDate!= None and selectedHour != None):
+        d_s = datetime.datetime.strptime(startDate[:len('2021-02-15')], '%Y-%m-%d')
+        print(d_s)
+
+        if (endDate != None): # date range
+            d_e = datetime.datetime.strptime(endDate[:len('2021-02-15')], '%Y-%m-%d')
+            d = d_s
+            delta = datetime.timedelta(days=1)
+            while d <= d_e:
+                # print (d.strftime("%Y-%m-%d"))
+                for t in range(selectedHour[0], selectedHour[1]):
+                    times.append((datetime.datetime(d.year, d.month, d.day, t)).strftime("%Y-%m-%d-%H"))
+                d += delta
+
+        else: # single range
+            for t in range(selectedHour[0], selectedHour[1]):
+                times.append((datetime.datetime(d_s.year, d_s.month, d_s.day, t)).strftime("%Y-%m-%d-%H"))
+
+    return times
+
 # support both single date and date range
 # single date: endDate is None
 def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour):
@@ -49,7 +72,7 @@ def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour
 
     # print(startDate, endDate)
     # print(selectedHour)
-    if(startDate!= None and selectedHour != None): # TODO: support multiple datePicked
+    if(startDate!= None and selectedHour != None):
         d_s = datetime.datetime.strptime(startDate[:len('2021-02-15')], '%Y-%m-%d')
         df_output['timestamp'] = df_output['timestamp'].astype('datetime64[ns]') # <class 'pandas._libs.tslibs.timestamps.Timestamp'> Pandas replacement for datetime.datetime
 
@@ -83,6 +106,29 @@ def get_selected_data(routeSelected, direction, startDate, endDate, selectedHour
     # print(df_output.shape)
 
     return (df_output)
+
+def calc_distance(coord1, coord2):
+    dist = float(geodesic(coord1, coord2).miles)
+    return round(dist, 1)
+
+def add_distance(df_input):
+    df_input_dist = df_input.copy(deep=True)
+
+    # anchor point: first point of df_input
+    # lat_s = df_input_dist.iloc[0]['lat'] 
+    # lon_s = df_input_dist.iloc[0]['lon']
+    # # print (lon_s, lat_s)
+    # df_input_dist['distance'] = df_input_dist.apply(lambda x:
+    #                                         calc_distance(coord1=(lat_s, lon_s),
+    #                                                 coord2=(x['lat'], x['lon'])), axis=1)
+
+    # anchor point: first point of every trip_id
+    df_input_dist['distance'] = df_input_dist.apply(lambda x:
+                                        calc_distance(coord1=(df_input_dist[df_input_dist['trip_id']==x['trip_id']].iloc[0]['lat'], 
+                                                                df_input_dist[df_input_dist['trip_id']==x['trip_id']].iloc[0]['lon']),
+                                                    coord2=(x['lat'], x['lon'])), axis=1)
+
+    return df_input_dist
 
 def calc_mph(coord1, coord2, time1, time2):
     if pd.isnull(time2):
@@ -131,58 +177,3 @@ def create_bus_speed_df(df_input):
         df_join = pd.concat([df_join,vh_df_mph],axis=0)
 
     return df_join
-
-# df_output = create_bus_speed_df(df)
-# df_output.to_csv('newdf.csv')
-
-
-
-# # travel speed
-
-# # group by trip id+service day+vehicle id
-# # service_date/trip_id/vehicle_id
-# for df_route in df.groupby(['route_short', 'service_date', 'trip_id', 'vehicle_id']):
-
-
-
-# df_bx19 = df.loc[df['route_short'] == 'Bx19', :]
-
-# # references
-# # https://en.wikipedia.org/wiki/World_Geodetic_System
-# # https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet
-# # https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset
-
-# # https://spatialreference.org/ref/epsg/4326/
-# crs_wgs84 = 4326  # WGS84, Latitute/Longitude, used by GPS
-
-# # https://spatialreference.org/ref/epsg/2263/
-# crs_epsg2263 = 2263  # NAD83 / New York Long Island (ftUS)
-# gdf_bx19 = gpd.GeoDataFrame(df_bx19, crs=crs_wgs84, geometry=gpd.points_from_xy(df_bx19['lon'], df_bx19['lat'])).to_crs(crs=crs_epsg2263)
-
-# gdf_bx19_NYCT_721 = gdf_bx19.loc[gdf_bx19['vehicle_id'] == 'MTA NYCT_721', :]
-
-# min_timestamp = gdf_bx19_NYCT_721['timestamp'].min()
-
-# gdf_bx19_NYCT_721.reset_index(drop=True, inplace=True)
-
-# # function to calculate mph
-# def calc_mph(coord1, coord2, time1, time2):
-#     if pd.isnull(time2):
-#         return
-#     else:
-#         dist = float(geodesic(coord1, coord2).miles)
-#         hrs = float(pd.Timedelta(time2-time1).total_seconds()) / (60.0 * 60.0)  # divide by 60 * 60 for hours
-#         return dist / hrs
-
-# gdf_bx19_NYCT_721_shifted = gdf_bx19_NYCT_721.shift(periods=-1)
-
-# # merge timestamp, lat, and lon columns from shifted df to non-shifted df
-# gdf_bx19_NYCT_721_mph = gdf_bx19_NYCT_721.merge(gdf_bx19_NYCT_721_shifted[['timestamp', 'lat', 'lon']],
-#                                                 how='inner', left_index=True, right_index=True,
-#                                                 suffixes=('', '_next'))
-
-# gdf_bx19_NYCT_721_mph['mph'] = gdf_bx19_NYCT_721_mph.apply(lambda x:
-#                                                            calc_mph(coord1=(x['lat'], x['lon']),
-#                                                                     coord2=(x['lat_next'], x['lon_next']),
-#                                                                     time1=x['timestamp'],
-#                                                                     time2=x['timestamp_next']), axis=1)

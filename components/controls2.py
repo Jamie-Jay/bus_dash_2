@@ -9,6 +9,7 @@ from datetime import datetime as dt
 import sys
 sys.path.append('../')
 from data.datafeed import totalList as totalList
+import components.graphs
 
 from app import app
 
@@ -51,8 +52,8 @@ date_range = dbc.FormGroup(
             min_date_allowed=dt(2021, 2, 1),
             max_date_allowed=dt(2021, 2, 28),
             initial_visible_month=dt(2021, 2, 1),
-            start_date=dt(2021, 2, 14),
-            end_date=dt(2021, 2, 15),
+            start_date=dt(2021, 2, 3),
+            end_date=dt(2021, 2, 4),
             display_format="MMMM D, YYYY",
             minimum_nights=0, # allow picking one day
             # calendar_orientation='vertical',
@@ -137,16 +138,22 @@ day_range = dbc.FormGroup(
 
 aggregate_opt = dbc.FormGroup(
     [
-        dbc.Label("Select an aggregation option"),
-        dbc.RadioItems(
-            id="aggregate-opt",
-            options=[
-                {"label": "by hour", "value": 1},
-                {"label": "by day", "value": 2},
-                {"label": "by week", "value": 3},
-                {"label": "by month", "value": 4},
-            ],
-            value=[2],
+        dbc.Label("By hour aggregation"),
+        # dbc.RadioItems(
+        #     id="aggregate-opt",
+        #     options=[
+        #         {"label": "by hour", "value": 1},
+        #         {"label": "by day", "value": 2},
+        #         {"label": "by week", "value": 3},
+        #         {"label": "by month", "value": 4},
+        #     ],
+        #     value=[2],
+        # ),
+        dcc.RadioItems(
+            id='time-options',
+            # options=[{'label': x, 'value': x} 
+            #         for x in df.columns],
+            # value=df.columns.tolist(),
         ),
     ]
 )
@@ -167,7 +174,8 @@ tab2_content = dbc.Card(
     dbc.CardBody(
         [
             # html.P("This is tab 2!", className="card-text"),
-            dbc.Form([time_range, day_range, date_range])
+            # dbc.Form([time_range, day_range, date_range]) # TODO: add interactive day_range
+            dbc.Form([time_range, date_range])
         ]
     ),
     className="mt-3",
@@ -192,7 +200,7 @@ tabs = dbc.Tabs(
         dbc.Tab(tab2_content, label="Time filter"),
         dbc.Tab(
             # "This tab's content is never seen", 
-            tab3_content, label="Aggregrate", disabled=True
+            tab3_content, label="Aggregrate", disabled=False
         ),
     ]
 )

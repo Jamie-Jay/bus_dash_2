@@ -45,7 +45,7 @@ def MainPage():
                         ],
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
                         className='col-4',
-                        style={"margin": '0px', 'padding':'0px'}
+                        # style={"margin": '0px 0px 0px 0px', 'padding':'0px'}
                     ),
                     dbc.Col(
                         # Column for bunching
@@ -54,7 +54,7 @@ def MainPage():
                         ],
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
                         className='col-4',
-                        style={"margin": '0px', 'padding':'0px'}
+                        style={'padding':'0px'}
                     ),
                     dbc.Col(
                         # Column for dwell time
@@ -63,7 +63,7 @@ def MainPage():
                         ],
                         className='col-4',
                         # className='col-lg-6 col-md-12 col-xs-12 col-sm-12',
-                        style={"margin": '0px', 'padding':'0px'}
+                        # style={"margin": '0px', 'padding':'0px'}
                     ),
                 ]
             )
