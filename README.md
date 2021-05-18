@@ -2,7 +2,7 @@
 
 ## About this app
 
-This is a demo of the Dash interactive Python framework developed by [Plotly](https://plot.ly/).
+This is a visualization app demonstrating data analysis on observed bus positions on 4 routes serving the East 149th Street corridor in the Bronx. It uses the Dash interactive Python framework developed by [Plotly](https://plot.ly/).
 
 ## How to run this app
 
@@ -11,7 +11,7 @@ This is a demo of the Dash interactive Python framework developed by [Plotly](ht
 To run this app first clone repository and then open a terminal to the app folder.
 
 ```
-git clone https://github.com/anthonymobile/bus_dash_2
+git clone https://github.com/Jamie-Jay/bus_dash_2
 cd bus_dash_2
 ```
 
@@ -52,14 +52,10 @@ Run the app:
 ```
 python data/creategeojson.py
 ```
-2. Run:
+2. Run: -->
 ```
 python index.py
-``` -->
-1. Run:
 ```
-python index.py
-``` 
 You can run the app on your browser at http://127.0.0.1:8050
 
 

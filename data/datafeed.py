@@ -7,8 +7,8 @@ from geopy.distance import geodesic
 
 # Initialize data frame
 # datafile='data/feb2021e149th.csv'
-datafile='data/feb2021e149th_Bx19_processed.csv'
 # df=pd.read_csv(datafile, sep='\t', skiprows=1)
+datafile='data/feb2021e149th_Bx19_processed.csv'
 df=pd.read_csv(datafile)
 # new cols: dwelling, bunch_flag, mph
 
@@ -35,7 +35,7 @@ def get_selected_time(startDate, endDate, selectedHour):
 
     if(startDate!= None and selectedHour != None):
         d_s = datetime.datetime.strptime(startDate[:len('2021-02-15')], '%Y-%m-%d')
-        print(d_s)
+        # print(d_s)
 
         if (endDate != None): # date range
             d_e = datetime.datetime.strptime(endDate[:len('2021-02-15')], '%Y-%m-%d')
@@ -44,12 +44,12 @@ def get_selected_time(startDate, endDate, selectedHour):
             while d <= d_e:
                 # print (d.strftime("%Y-%m-%d"))
                 for t in range(selectedHour[0], selectedHour[1]):
-                    times.append((datetime.datetime(d.year, d.month, d.day, t)).strftime("%Y-%m-%d-%H"))
+                    times.append(datetime.datetime(d.year, d.month, d.day, t))
                 d += delta
 
         else: # single range
             for t in range(selectedHour[0], selectedHour[1]):
-                times.append((datetime.datetime(d_s.year, d_s.month, d_s.day, t)).strftime("%Y-%m-%d-%H"))
+                times.append(datetime.datetime(d_s.year, d_s.month, d_s.day, t))
 
     return times
 

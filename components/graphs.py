@@ -16,7 +16,7 @@ from data.datafeed import totalList as totalList
 from data.datafeed import get_selected_data as get_selected_data
 from data.datafeed import add_distance as add_distance
 from data.datafeed import get_selected_time as get_selected_time
-import constants
+import data.constants as constants
 
 from app import app
 
@@ -143,13 +143,17 @@ def update_graph_animated(routeSelected, direction, startDate, endDate, selected
 )
 def update_time_radioitems(startDate, endDate, selectedHour):
     hours = get_selected_time(startDate, endDate, selectedHour)
-    # df_time = df_animated[]
+    
+    timeOptions = []
+    for h in hours:
+        timeOptions.append(h.strftime("%Y-%m-%d %H:00"))
+
     options=[{'label': x, 'value': x} 
-              for x in hours]
-    return options, hours[0]
+              for x in timeOptions]
+    return options, timeOptions[0]
 
 def get_time_option_data(routeSelected, direction, timeOption):
-    target = dt.strptime(timeOption, '%Y-%m-%d-%H')
+    target = dt.strptime(timeOption, '%Y-%m-%d %H:00')
     start_Date = target.strftime("%Y-%m-%d")
     end_Date = None
     time_option = [target.hour, target.hour+1]

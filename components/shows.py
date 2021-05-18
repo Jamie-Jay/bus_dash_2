@@ -6,7 +6,7 @@ import json
 import numpy as np
 from plotly import graph_objs as go
 
-import constants
+import data.constants as constants
 import components.graphs as graphs
 
 def show_position_stat():
