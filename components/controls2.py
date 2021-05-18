@@ -35,7 +35,7 @@ route_direction = dbc.FormGroup(
         dbc.Label("Route Direction", className='h3'),
         dcc.Checklist(
             id="route-d-selector",
-            options=[
+            options=[ # TODO: update the direction options dynamically
                 {"label": "0", "value": 0},
                 {"label": "1", "value": 1}
             ],
@@ -167,7 +167,7 @@ tab1_content = dbc.Card(
         ]
     ),
     className="mt-3",
-    color='#000000'
+    color='#323130'
 )
 
 tab2_content = dbc.Card(
@@ -179,7 +179,7 @@ tab2_content = dbc.Card(
         ]
     ),
     className="mt-3",
-    color='#000000'
+    color='#323130'
 )
 
 tab3_content = dbc.Card(
@@ -190,7 +190,7 @@ tab3_content = dbc.Card(
         ]
     ),
     className="mt-3",
-    color='#000000'
+    color='#323130'
 )
 
 

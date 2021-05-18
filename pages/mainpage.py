@@ -17,7 +17,7 @@ def MainPage():
                     dbc.Col(
                         # Column for user controls
                         [
-                            dbc.Label("Contol board"),
+                            dbc.Label("Control Board"),
                             controls2.tabs
                         ],
                         # className='col-lg-6 col-md-6 col-xs-12 col-sm-12',

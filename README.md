@@ -47,7 +47,7 @@ export MAPBOX_API_KEY=<your map box access token>
 ``` -->
 
 Run the app:
-1. Simulate backend data:
+<!-- 1. Simulate backend data:
 - Create geojson for bus stops:
 ```
 python data/creategeojson.py
@@ -55,7 +55,11 @@ python data/creategeojson.py
 2. Run:
 ```
 python index.py
+``` -->
+1. Run:
 ```
+python index.py
+``` 
 You can run the app on your browser at http://127.0.0.1:8050
 
 

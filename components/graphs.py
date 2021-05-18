@@ -171,7 +171,7 @@ def update_heatmap_layout(fig):
                         ),
                 standoff = 1, # 设置标题和标签的距离，大于等于0的数字，注意标题是不会超出页边的   
             ),
-            showgrid=False,
+            # showgrid=False,
         ),
         yaxis = dict(
             #color='#444',
@@ -184,9 +184,9 @@ def update_heatmap_layout(fig):
                         ),
                 standoff = 1, # 设置标题和标签的距离，大于等于0的数字，注意标题是不会超出页边的   
             ),
-            showgrid=False,
+            # showgrid=False,
         ),
-        showlegend=False,
+        # showlegend=False,
         plot_bgcolor="#323130",
         paper_bgcolor="#323130",
         dragmode="select",
@@ -251,8 +251,9 @@ def update_travel_speed(routeSelected, direction, timeOption):
             z=df_timeOption['mph'],
             x=df_timeOption['timestamp'],
             y=df_timeOption['distance'],
-            colorscale='deep')
+            colorscale='Viridis' # https://plotly.com/python/builtin-colorscales/
         )
+    )
 
     # title='HeatMap - Travel Speed (mph)',
     update_heatmap_layout(fig)
@@ -280,8 +281,9 @@ def update_bunching(routeSelected, direction, timeOption):
             z=df_timeOption['bunch_count'],
             x=df_timeOption['timestamp'],
             y=df_timeOption['distance'],
-            colorscale='deep')
+            colorscale='Viridis'
         )
+    )
 
     # title='HeatMap - Bunching Count',
     update_heatmap_layout(fig)
@@ -308,7 +310,7 @@ def update_dwell_time(routeSelected, direction, timeOption):
             z=df_timeOption['dwelling'],
             x=df_timeOption['timestamp'],
             y=df_timeOption['distance'],
-            colorscale='deep'
+            colorscale='Viridis'
         )
     )
 

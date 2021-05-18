@@ -21,11 +21,19 @@ def homepage_body(logo_src):
                         ),
 
                         html.Div(children=[
-                                  html.
-                                  P("""This visualization shows observed bus positions on 4 routes
-                                                      serving the East 149th Street corridor in the Bronx.
-                                                      Select different days using the date picker or by
-                                                      selecting different time frames on the histogram."""
+                                  html.P("""This visualization shows data analysis on observed bus positions on 4 routes
+                                                      serving the East 149th Street corridor in the Bronx."""
+                                    ),
+                                  html.P("""The MainPage shows bus position and travel speed on an animated map,
+                                                      and three bus service quality metrics on heatmap graphs.
+                                                      The data will be filtered through selecting different options on 
+                                                      the control panel on the top left side of the webpage. 
+                                                      The panel also provide hourly aggregation options
+                                                      for the heatmap graphs."""
+                                    ),
+                                  html.P("""The Appendix page shows the bus position data on a histogram and a map. 
+                                                      It supports filters for user specific data.
+                                                      The page also shows all the bus stops in Bronx in a static map."""
                                     ),
                                   dcc.Markdown(children=[
                                       "Source: [Cornell Tech Urban Tech Hub]("
